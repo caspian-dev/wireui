@@ -10,13 +10,14 @@ class Select extends NativeSelect
 
     public string $optionComponent;
 
+    public string $optionsHash;
+
+    public ?string $icon;
+
     public bool $searchable;
 
     public bool $multiselect;
 
-    public ?string $icon;
-
-    /** @param Collection|array|null $options */
     public function __construct(
         string $rightIcon = 'selector',
         string $optionComponent = 'select.option',
@@ -48,10 +49,35 @@ class Select extends NativeSelect
         $this->searchable      = $searchable;
         $this->multiselect     = $multiselect;
         $this->icon            = $icon;
+        $this->optionsHash     = 'wireui:select:' . md5($this->options);
     }
 
     protected function getView(): string
     {
         return 'wireui::components.select';
+    }
+
+    public function optionsToJson(): string
+    {
+        return $this->options->map(function (mixed $rawOption, int $index) {
+            $option = [
+                'label' => $this->getOptionLabel($index, $rawOption),
+                'value' => $this->getOptionValue($index, $rawOption),
+            ];
+
+            if ($component = data_get($rawOption, 'component')) {
+                $option['component'] = $component;
+            }
+
+            if (data_get($rawOption, 'disabled')) {
+                $option['disabled'] = true;
+            }
+
+            if (data_get($rawOption, 'readonly')) {
+                $option['readonly'] = true;
+            }
+
+            return $option;
+        })->toJson();
     }
 }

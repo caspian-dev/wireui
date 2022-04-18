@@ -4,10 +4,19 @@
         multiselect: @boolean($multiselect),
         readonly:    @boolean($readonly),
         disabled:    @boolean($disabled),
-        placeholder: '{{ $placeholder }}',
-        optionValue: '{{ $optionValue }}',
-        optionLabel: '{{ $optionLabel }}',
-    })" class="relative" {{ $attributes->only('wire:key') }}>
+        optionsHash: @js($optionsHash),
+        placeholder: @js($placeholder),
+        optionValue: @js($optionValue),
+        optionLabel: @js($optionLabel),
+    })" {{ $attributes->only(['class', 'wire:key'])->class('relative') }}>
+
+    @if (session()->missing($optionsHash))
+        <div hidden id="{{ $optionsHash }}">@json($optionsToJson())</div>
+
+        @php(session()->now($optionsHash, true))
+    @endif
+
+
     <div class="relative">
         @if ($label)
             <x-dynamic-component
@@ -137,7 +146,14 @@
             x-on:keydown.arrow-down.prevent="$event.shiftKey || getNextFocusable().focus()"
             x-on:keydown.shift.tab.prevent="getPrevFocusable().focus()"
             x-on:keydown.arrow-up.prevent="getPrevFocusable().focus()">
-            @if ($options)
+            <template x-for="option in options">
+                <div>
+                    <span x-text="option"></span>
+                    <br>
+                    <br>
+                </div>
+            </template>
+            {{-- @if ($options)
                 @forelse ($options as $key => $option)
                     <x-dynamic-component
                         :component="data_get($option, 'component', $optionComponent)"
@@ -156,7 +172,7 @@
                         readonly
                     />
                 @endforelse
-            @else {{ $slot }} @endif
+            @else {{ $slot }} @endif --}}
         </ul>
     </div>
 </div>

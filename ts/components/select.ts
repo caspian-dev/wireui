@@ -1,5 +1,6 @@
 export interface InitOptions {
   model: any
+  optionsHash: string
   searchable: boolean
   multiselect: boolean
   readonly: boolean
@@ -25,6 +26,7 @@ export default (options: InitOptions): Select => ({
   popover: false,
   search: '',
   selectedOptions: [],
+  options: [],
 
   init () {
     this.initMultiSelect()
@@ -36,6 +38,26 @@ export default (options: InitOptions): Select => ({
     })
     this.$watch('model', selected => this.syncSelected(selected))
     this.$watch('search', search => this.filterOptions(search?.toLowerCase()))
+    console.log('init')
+
+    // const observer = new MutationObserver(mutations => {
+    //   const textContent = mutations[0]?.target?.textContent
+    //   console.log({ textContent })
+    //   if (!textContent) return
+
+    //   this.options = JSON.parse(textContent)
+
+    //   console.log({ options: this.options })
+    // })
+
+    // const dataElement = document.getElementById(options.optionsHash)
+    // console.log({ dataElement })
+    // if (dataElement) {
+    //   observer.observe(dataElement, {
+    //     subtree: true,
+    //     characterData: true
+    //   })
+    // }
   },
   togglePopover () {
     if (this.readonly || this.disabled) return
@@ -169,9 +191,11 @@ export default (options: InitOptions): Select => ({
     return textarea.value
   },
   getFocusables () {
-    const focusables = this.$el?.querySelectorAll('li, input') ?? []
+    const focusables = this.$el.querySelectorAll('li, input')
 
-    return focusables.length > 0 ? [...focusables] : [...this.$root?.querySelectorAll('li, input')]
+    return focusables.length > 0
+      ? [...focusables]
+      : [...this.$root.querySelectorAll('li, input')]
   },
   getFirstFocusable () { return this.getFocusables().shift() },
   getLastFocusable () { return this.getFocusables().pop() },
