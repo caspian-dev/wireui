@@ -11,7 +11,7 @@ dayjs.extend(customParseFormat)
 dayjs.extend(localizedFormat)
 
 dayjs.extend(jalaliday)
-
+dayjs.calendar('jalali') // Jalali Calendar
 export type Dateable = {
   timezone: string
   addMonth (): Dateable
